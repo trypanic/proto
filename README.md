@@ -77,6 +77,8 @@ skillshare --help
 
 Pushes to `main` run GitHub Actions validation for the checked-out plugin definitions:
 
+- Linux `x86_64` on `ubuntu-24.04`
+- Linux `aarch64` on `ubuntu-24.04-arm`
 - macOS `x86_64` on `macos-15-intel`
 - macOS `aarch64` on `macos-15`
 - Windows `x86_64` on `windows-2025`

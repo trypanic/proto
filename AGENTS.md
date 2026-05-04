@@ -25,20 +25,21 @@ This repository publishes static Proto plugin definitions for third-party CLI to
 Validate against an isolated proto home so user state doesn't pollute the result:
 
 ```sh
+repo_root="$(pwd)"
 tmpdir="$(mktemp -d)"
-mkdir -p "$tmpdir/home"
+mkdir -p "$tmpdir/user-home"
 cat > "$tmpdir/.prototools" <<EOF
 golang-migrate = "4.19.0"
 skillshare = "0.19.5"
 
 [plugins.tools]
-golang-migrate = "file://$(pwd)/golang-migrate.toml"
-skillshare = "file://$(pwd)/skillshare.toml"
+golang-migrate = "file://$repo_root/plugins/golang-migrate.toml"
+skillshare = "file://$repo_root/plugins/skillshare.toml"
 EOF
 
 cd "$tmpdir"
-PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/home" proto install golang-migrate --config-mode local
-PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/home" proto install skillshare --config-mode local
+PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install golang-migrate --config-mode local
+PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install skillshare --config-mode local
 
 "$tmpdir/.proto/tools/golang-migrate/4.19.0/migrate" -version    # → 4.19.0
 "$tmpdir/.proto/tools/skillshare/0.19.5/skillshare" --version    # → skillshare v0.19.5
@@ -49,7 +50,7 @@ Use explicit upstream versions, never `latest` — validation must be reproducib
 
 ## CI Expectations
 
-- Pushes to `main` should validate macOS and Windows support.
+- Pushes to `main` should validate Linux, macOS, and Windows support.
 - Keep runner labels aligned with GitHub-hosted runner availability.
 - Test the checked-out plugin files with `file://./plugins/<plugin>.toml`, not the raw `main` URLs. This validates the commit under test.
 - Each CI job should install Proto, generate a temporary `.prototools`, install every supported plugin, and verify the installed executable.
