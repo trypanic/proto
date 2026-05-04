@@ -40,6 +40,8 @@ jobs:
           '@
 
           if ("${{ matrix.arch }}" -eq "x86_64") {
+            $toolPins += "`nsentrux = `"0.5.7`""
+            $toolPlugins += "`nsentrux = `"file://./plugins/sentrux.toml`""
             $toolPins += "`nstaticcheck = `"2026.1.0`""
             $toolPlugins += "`nstaticcheck = `"file://./plugins/staticcheck.toml`""
           }
@@ -69,6 +71,17 @@ jobs:
           $version = (& proto run skillshare -- --version 2>&1 | Out-String).Trim()
           if ($version -ne "skillshare v0.19.5") {
             throw "Expected skillshare v0.19.5, got '$version'"
+          }
+
+      - name: Verify sentrux
+        if: matrix.arch == 'x86_64'
+        shell: pwsh
+        env:
+          SENTRUX_SKIP_GRAMMAR_DOWNLOAD: "1"
+        run: |
+          $version = (& proto run sentrux -- --version 2>&1 | Out-String).Trim()
+          if ($version -ne "sentrux 0.5.7") {
+            throw "Expected sentrux 0.5.7, got '$version'"
           }
 
       - name: Verify staticcheck

@@ -1,0 +1,23 @@
+name = "sentrux"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+download-file = "sentrux-linux-{arch}"
+
+[platform.macos]
+archs = ["aarch64"]
+download-file = "sentrux-darwin-arm64"
+
+[platform.windows]
+archs = ["x86_64"]
+download-file = "sentrux-windows-x86_64.exe"
+
+[install]
+download-url = "https://github.com/sentrux/sentrux/releases/download/v{version}/{download_file}"
+
+[install.exes.sentrux]
+primary = true
+
+[resolve]
+git-url = "https://github.com/sentrux/sentrux"

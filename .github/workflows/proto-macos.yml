@@ -32,12 +32,23 @@ jobs:
           golang-migrate = "4.19.0"
           skillshare = "0.19.5"
           staticcheck = "2026.1.0"
-
+          EOF
+          if [ "${{ matrix.arch }}" = "aarch64" ]; then
+            cat >> .prototools <<'EOF'
+          sentrux = "0.5.7"
+          EOF
+          fi
+          cat >> .prototools <<'EOF'
           [plugins.tools]
           golang-migrate = "file://./plugins/golang-migrate.toml"
           skillshare = "file://./plugins/skillshare.toml"
           staticcheck = "file://./plugins/staticcheck.toml"
           EOF
+          if [ "${{ matrix.arch }}" = "aarch64" ]; then
+            cat >> .prototools <<'EOF'
+          sentrux = "file://./plugins/sentrux.toml"
+          EOF
+          fi
 
       - name: Install plugin tools
         run: proto install --config-mode local
@@ -51,6 +62,14 @@ jobs:
         run: |
           version="$(proto run skillshare -- --version 2>&1)"
           test "$version" = "skillshare v0.19.5"
+
+      - name: Verify sentrux
+        if: matrix.arch == 'aarch64'
+        env:
+          SENTRUX_SKIP_GRAMMAR_DOWNLOAD: "1"
+        run: |
+          version="$(proto run sentrux -- --version 2>&1)"
+          test "$version" = "sentrux 0.5.7"
 
       - name: Verify staticcheck
         run: |
