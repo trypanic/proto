@@ -6,7 +6,7 @@ This repository publishes static Proto plugin definitions for third-party CLI to
 
 - Each `plugins/*.toml` file is a Proto non-WASM tool plugin.
 - The plugins are intended to be consumed from other repositories through raw GitHub URLs in `[plugins.tools]`.
-- The supported public tool IDs are the TOML file names without the extension, for example `golang-migrate` and `skillshare`.
+- The supported public tool IDs are the TOML file names without the extension, for example `golang-migrate`, `skillshare`, and `staticcheck`.
 - Changes here can affect multiple downstream projects, so prefer small, verifiable edits.
 
 ## Maintenance Rules
@@ -31,21 +31,25 @@ mkdir -p "$tmpdir/user-home"
 cat > "$tmpdir/.prototools" <<EOF
 golang-migrate = "4.19.0"
 skillshare = "0.19.5"
+staticcheck = "2026.1.0"
 
 [plugins.tools]
 golang-migrate = "file://$repo_root/plugins/golang-migrate.toml"
 skillshare = "file://$repo_root/plugins/skillshare.toml"
+staticcheck = "file://$repo_root/plugins/staticcheck.toml"
 EOF
 
 cd "$tmpdir"
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install golang-migrate --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install skillshare --config-mode local
+PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install staticcheck --config-mode local
 
 "$tmpdir/.proto/tools/golang-migrate/4.19.0/migrate" -version    # → 4.19.0
 "$tmpdir/.proto/tools/skillshare/0.19.5/skillshare" --version    # → skillshare v0.19.5
+"$tmpdir/.proto/tools/staticcheck/2026.1.0/staticcheck/staticcheck" -version    # → staticcheck 2026.1 (v0.7.0)
 ```
 
-Use explicit upstream versions, never `latest` — validation must be reproducible.
+Use explicit tool versions, never `latest` — validation must be reproducible. Staticcheck's upstream `2026.1` tag is pinned as `2026.1.0` because Proto requires fully qualified versions.
 
 
 ## CI Expectations
@@ -74,10 +78,12 @@ When using these plugins in another repository, add the raw URLs to that reposit
 ```toml
 golang-migrate = "<version>"
 skillshare = "<version>"
+staticcheck = "<version>"
 
 [plugins.tools]
 golang-migrate = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/golang-migrate.toml"
 skillshare = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/skillshare.toml"
+staticcheck = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/staticcheck.toml"
 ```
 
 Prefer explicit versions known to exist upstream. Run `proto install --config-mode local` from the consuming repository to verify the configuration.

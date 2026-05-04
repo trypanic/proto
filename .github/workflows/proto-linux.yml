@@ -31,10 +31,12 @@ jobs:
           cat > .prototools <<'EOF_CONFIG'
           golang-migrate = "4.19.0"
           skillshare = "0.19.5"
+          staticcheck = "2026.1.0"
 
           [plugins.tools]
           golang-migrate = "file://./plugins/golang-migrate.toml"
           skillshare = "file://./plugins/skillshare.toml"
+          staticcheck = "file://./plugins/staticcheck.toml"
           EOF_CONFIG
 
       - name: Install plugin tools
@@ -49,3 +51,8 @@ jobs:
         run: |
           version="$(proto run skillshare -- --version 2>&1)"
           test "$version" = "skillshare v0.19.5"
+
+      - name: Verify staticcheck
+        run: |
+          version="$(proto run staticcheck -- -version 2>&1)"
+          test "$version" = "staticcheck 2026.1 (v0.7.0)"

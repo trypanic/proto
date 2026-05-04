@@ -1,0 +1,31 @@
+name = "staticcheck"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+download-file = "staticcheck_linux_{arch}.tar.gz"
+exe-path = "staticcheck/staticcheck"
+
+[platform.macos]
+archs = ["x86_64", "aarch64"]
+download-file = "staticcheck_darwin_{arch}.tar.gz"
+exe-path = "staticcheck/staticcheck"
+
+[platform.windows]
+archs = ["x86_64"]
+download-file = "staticcheck_windows_{arch}.tar.gz"
+exe-path = "staticcheck/staticcheck.exe"
+
+[install]
+download-url = "https://github.com/dominikh/go-tools/releases/download/{versionMajor}.{versionMinor}/{download_file}"
+
+[install.arch]
+x86_64 = "amd64"
+aarch64 = "arm64"
+
+[install.exes.staticcheck]
+primary = true
+
+[resolve]
+git-url = "https://github.com/dominikh/go-tools"
+version-pattern = "^(?<major>\\d{4})(?:\\.(?<minor>\\d+))?$"

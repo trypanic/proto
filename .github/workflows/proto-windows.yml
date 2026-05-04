@@ -29,14 +29,26 @@ jobs:
       - name: Configure test tools
         shell: pwsh
         run: |
-          $config = @'
+          $toolPins = @'
           golang-migrate = "4.19.0"
           skillshare = "0.19.5"
+          '@
 
-          [plugins.tools]
+          $toolPlugins = @'
           golang-migrate = "file://./plugins/golang-migrate.toml"
           skillshare = "file://./plugins/skillshare.toml"
           '@
+
+          if ("${{ matrix.arch }}" -eq "x86_64") {
+            $toolPins += "`nstaticcheck = `"2026.1.0`""
+            $toolPlugins += "`nstaticcheck = `"file://./plugins/staticcheck.toml`""
+          }
+
+          $config = @"
+          $toolPins
+          [plugins.tools]
+          $toolPlugins
+          "@
           Set-Content -Path .prototools -Value $config -NoNewline
 
       - name: Install plugin tools
@@ -57,4 +69,13 @@ jobs:
           $version = (& proto run skillshare -- --version 2>&1 | Out-String).Trim()
           if ($version -ne "skillshare v0.19.5") {
             throw "Expected skillshare v0.19.5, got '$version'"
+          }
+
+      - name: Verify staticcheck
+        if: matrix.arch == 'x86_64'
+        shell: pwsh
+        run: |
+          $version = (& proto run staticcheck -- -version 2>&1 | Out-String).Trim()
+          if ($version -ne "staticcheck 2026.1 (v0.7.0)") {
+            throw "Expected staticcheck 2026.1 (v0.7.0), got '$version'"
           }
