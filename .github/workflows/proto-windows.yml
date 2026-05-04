@@ -80,8 +80,8 @@ jobs:
           SENTRUX_SKIP_GRAMMAR_DOWNLOAD: "1"
         run: |
           $output = (& proto run sentrux -- --version 2>&1 | Out-String).Trim()
-          $version = ($output -split "`r?`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -Last 1).Trim()
-          if ($version -ne "sentrux 0.5.7") {
+          $lines = $output -split "`r?`n" | ForEach-Object { $_.Trim() }
+          if ($lines -notcontains "sentrux 0.5.7") {
             throw "Expected sentrux 0.5.7, got output '$output'"
           }
 
