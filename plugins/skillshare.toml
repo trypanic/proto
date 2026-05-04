@@ -1,0 +1,30 @@
+name = "skillshare"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+download-file = "skillshare_{version}_linux_{arch}.tar.gz"
+exe-path = "skillshare"
+
+[platform.macos]
+archs = ["x86_64", "aarch64"]
+download-file = "skillshare_{version}_darwin_{arch}.tar.gz"
+exe-path = "skillshare"
+
+[platform.windows]
+archs = ["x86_64", "aarch64"]
+download-file = "skillshare_{version}_windows_{arch}.zip"
+exe-path = "skillshare.exe"
+
+[install]
+download-url = "https://github.com/runkids/skillshare/releases/download/v{version}/{download_file}"
+
+[install.arch]
+x86_64 = "amd64"
+aarch64 = "arm64"
+
+[install.exes.skillshare]
+primary = true
+
+[resolve]
+git-url = "https://github.com/runkids/skillshare"

@@ -1,0 +1,30 @@
+name = "golang-migrate"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+download-file = "migrate.linux-{arch}.tar.gz"
+exe-path = "migrate"
+
+[platform.macos]
+archs = ["x86_64", "aarch64"]
+download-file = "migrate.darwin-{arch}.tar.gz"
+exe-path = "migrate"
+
+[platform.windows]
+archs = ["x86_64", "aarch64"]
+download-file = "migrate.windows-{arch}.zip"
+exe-path = "migrate.exe"
+
+[install]
+download-url = "https://github.com/golang-migrate/migrate/releases/download/v{version}/{download_file}"
+
+[install.arch]
+x86_64 = "amd64"
+aarch64 = "arm64"
+
+[install.exes.migrate]
+primary = true
+
+[resolve]
+git-url = "https://github.com/golang-migrate/migrate"
