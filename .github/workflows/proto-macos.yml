@@ -1,0 +1,51 @@
+name: Proto plugins macOS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: macos-15-intel
+          - arch: aarch64
+            runner: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install proto
+        uses: moonrepo/setup-toolchain@v0
+
+      - name: Configure test tools
+        run: |
+          cat > .prototools <<'EOF'
+          golang-migrate = "4.19.0"
+          skillshare = "0.19.5"
+
+          [plugins.tools]
+          golang-migrate = "file://./plugins/golang-migrate.toml"
+          skillshare = "file://./plugins/skillshare.toml"
+          EOF
+
+      - name: Install plugin tools
+        run: proto install --config-mode local
+
+      - name: Verify golang-migrate
+        run: |
+          version="$(proto run golang-migrate -- -version)"
+          test "$version" = "4.19.0"
+
+      - name: Verify skillshare
+        run: |
+          version="$(proto run skillshare -- --version)"
+          test "$version" = "skillshare v0.19.5"

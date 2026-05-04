@@ -1,0 +1,60 @@
+name: Proto plugins Windows
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test Windows ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: windows-2025
+          - arch: aarch64
+            runner: windows-11-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install proto
+        uses: moonrepo/setup-toolchain@v0
+
+      - name: Configure test tools
+        shell: pwsh
+        run: |
+          $config = @'
+          golang-migrate = "4.19.0"
+          skillshare = "0.19.5"
+
+          [plugins.tools]
+          golang-migrate = "file://./plugins/golang-migrate.toml"
+          skillshare = "file://./plugins/skillshare.toml"
+          '@
+          Set-Content -Path .prototools -Value $config -NoNewline
+
+      - name: Install plugin tools
+        shell: pwsh
+        run: proto install --config-mode local
+
+      - name: Verify golang-migrate
+        shell: pwsh
+        run: |
+          $version = proto run golang-migrate -- -version
+          if ($version -ne "4.19.0") {
+            throw "Expected golang-migrate 4.19.0, got '$version'"
+          }
+
+      - name: Verify skillshare
+        shell: pwsh
+        run: |
+          $version = proto run skillshare -- --version
+          if ($version -ne "skillshare v0.19.5") {
+            throw "Expected skillshare v0.19.5, got '$version'"
+          }
