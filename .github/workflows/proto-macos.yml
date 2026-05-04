@@ -68,8 +68,12 @@ jobs:
         env:
           SENTRUX_SKIP_GRAMMAR_DOWNLOAD: "1"
         run: |
-          version="$(proto run sentrux -- --version 2>&1)"
-          test "$version" = "sentrux 0.5.7"
+          output="$(proto run sentrux -- --version 2>&1)"
+          version="$(printf '%s\n' "$output" | sed '/^[[:space:]]*$/d' | tail -n 1)"
+          if [ "$version" != "sentrux 0.5.7" ]; then
+            printf 'Expected sentrux 0.5.7, got output:\n%s\n' "$output"
+            exit 1
+          fi
 
       - name: Verify staticcheck
         run: |

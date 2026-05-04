@@ -79,9 +79,10 @@ jobs:
         env:
           SENTRUX_SKIP_GRAMMAR_DOWNLOAD: "1"
         run: |
-          $version = (& proto run sentrux -- --version 2>&1 | Out-String).Trim()
+          $output = (& proto run sentrux -- --version 2>&1 | Out-String).Trim()
+          $version = ($output -split "`r?`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -Last 1).Trim()
           if ($version -ne "sentrux 0.5.7") {
-            throw "Expected sentrux 0.5.7, got '$version'"
+            throw "Expected sentrux 0.5.7, got output '$output'"
           }
 
       - name: Verify staticcheck
