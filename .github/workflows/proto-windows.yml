@@ -46,7 +46,7 @@ jobs:
       - name: Verify golang-migrate
         shell: pwsh
         run: |
-          $version = proto run golang-migrate -- -version
+          $version = (& proto run golang-migrate -- -version 2>&1 | Out-String).Trim()
           if ($version -ne "4.19.0") {
             throw "Expected golang-migrate 4.19.0, got '$version'"
           }
@@ -54,7 +54,7 @@ jobs:
       - name: Verify skillshare
         shell: pwsh
         run: |
-          $version = proto run skillshare -- --version
+          $version = (& proto run skillshare -- --version 2>&1 | Out-String).Trim()
           if ($version -ne "skillshare v0.19.5") {
             throw "Expected skillshare v0.19.5, got '$version'"
           }

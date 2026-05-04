@@ -42,10 +42,10 @@ jobs:
 
       - name: Verify golang-migrate
         run: |
-          version="$(proto run golang-migrate -- -version)"
+          version="$(proto run golang-migrate -- -version 2>&1)"
           test "$version" = "4.19.0"
 
       - name: Verify skillshare
         run: |
-          version="$(proto run skillshare -- --version)"
+          version="$(proto run skillshare -- --version 2>&1)"
           test "$version" = "skillshare v0.19.5"
