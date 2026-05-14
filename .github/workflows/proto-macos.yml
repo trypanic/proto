@@ -30,6 +30,7 @@ jobs:
         run: |
           cat > .prototools <<'EOF'
           golang-migrate = "4.19.0"
+          psql = "18.3.0"
           skillshare = "0.19.5"
           staticcheck = "2026.1.0"
           EOF
@@ -41,6 +42,7 @@ jobs:
           cat >> .prototools <<'EOF'
           [plugins.tools]
           golang-migrate = "file://./plugins/golang-migrate.toml"
+          psql = "file://./plugins/psql.toml"
           skillshare = "file://./plugins/skillshare.toml"
           staticcheck = "file://./plugins/staticcheck.toml"
           EOF
@@ -62,6 +64,11 @@ jobs:
         run: |
           version="$(proto run skillshare -- --version 2>&1)"
           test "$version" = "skillshare v0.19.5"
+
+      - name: Verify psql
+        run: |
+          version="$(proto run psql -- --version 2>&1)"
+          test "$version" = "psql (PostgreSQL) 18.3"
 
       - name: Verify sentrux
         if: matrix.arch == 'aarch64'

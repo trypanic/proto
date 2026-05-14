@@ -9,6 +9,7 @@ The plugin files live under `plugins/`. Each TOML file is a non-WASM proto plugi
 | Tool | Plugin file | Executable | Upstream project | Supported platforms |
 | --- | --- | --- | --- | --- |
 | `golang-migrate` | `plugins/golang-migrate.toml` | `migrate` | `golang-migrate/migrate` | Linux, macOS, and Windows on `x86_64` and `aarch64` |
+| `psql` | `plugins/psql.toml` | `psql` | `theseus-rs/postgresql-binaries` | Linux, macOS, and Windows on `x86_64` and `aarch64` |
 | `sentrux` | `plugins/sentrux.toml` | `sentrux` | `sentrux/sentrux` | Linux on `x86_64` and `aarch64`; macOS on `aarch64`; Windows on `x86_64` |
 | `skillshare` | `plugins/skillshare.toml` | `skillshare` | `runkids/skillshare` | Linux, macOS, and Windows on `x86_64` and `aarch64` |
 | `staticcheck` | `plugins/staticcheck.toml` | `staticcheck` | `dominikh/go-tools` | Linux and macOS on `x86_64` and `aarch64`; Windows on `x86_64` |
@@ -33,12 +34,14 @@ Use the raw GitHub URLs for this repository:
 
 ```toml
 golang-migrate = "<version>"
+psql = "<version>"
 sentrux = "<version>"
 skillshare = "<version>"
 staticcheck = "<version>"
 
 [plugins.tools]
 golang-migrate = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/golang-migrate.toml"
+psql = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/psql.toml"
 sentrux = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/sentrux.toml"
 skillshare = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/skillshare.toml"
 staticcheck = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/staticcheck.toml"
@@ -62,6 +65,7 @@ Install one tool explicitly:
 
 ```sh
 proto install golang-migrate <version>
+proto install psql <version>
 proto install sentrux <version>
 proto install skillshare <version>
 proto install staticcheck <version>
@@ -71,6 +75,7 @@ Run through proto:
 
 ```sh
 proto run golang-migrate -- -version
+proto run psql -- --version
 proto run sentrux -- --version
 proto run skillshare -- --help
 proto run staticcheck -- -version
@@ -80,6 +85,7 @@ After proto shims are active in `PATH`, the primary executable can also be calle
 
 ```sh
 migrate -version
+psql --version
 sentrux --version
 skillshare --help
 staticcheck -version
@@ -96,7 +102,7 @@ Pushes to `main` run GitHub Actions validation for the checked-out plugin defini
 - Windows `x86_64` on `windows-2025`
 - Windows `aarch64` on `windows-11-arm`
 
-Each job installs proto, creates a temporary `.prototools` that points to the checked-out TOML plugin files under `plugins/`, installs supported plugin tools, and verifies the installed binaries. Sentrux is validated on Linux for both configured architectures, on macOS `aarch64`, and on Windows `x86_64`. Staticcheck is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`.
+Each job installs proto, creates a temporary `.prototools` that points to the checked-out TOML plugin files under `plugins/`, installs supported plugin tools, and verifies the installed binaries. Psql is validated on Linux, macOS, and Windows for both configured architectures. Sentrux is validated on Linux for both configured architectures, on macOS `aarch64`, and on Windows `x86_64`. Staticcheck is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`.
 
 ## Plugin details
 
@@ -119,6 +125,22 @@ The plugin resolves available versions from Git tags in `https://github.com/gola
 
 ```text
 https://github.com/golang-migrate/migrate/releases/download/v{version}/{download_file}
+```
+
+### psql
+
+`plugins/psql.toml` installs the PostgreSQL `psql` client binary from GitHub release archives published by `theseus-rs/postgresql-binaries`:
+
+- Linux: `postgresql-{version}-{arch}-unknown-linux-gnu.tar.gz`
+- macOS: `postgresql-{version}-{arch}-apple-darwin.tar.gz`
+- Windows: `postgresql-{version}-{arch}-pc-windows-msvc.tar.gz`
+
+The plugin uses proto/Rust architecture names directly because the release archive names use Rust target triples.
+
+The plugin resolves available versions from Git tags in `https://github.com/theseus-rs/postgresql-binaries` and downloads archives from:
+
+```text
+https://github.com/theseus-rs/postgresql-binaries/releases/download/{version}/{download_file}
 ```
 
 ### sentrux

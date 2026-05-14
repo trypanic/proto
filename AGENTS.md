@@ -6,7 +6,7 @@ This repository publishes static Proto plugin definitions for third-party CLI to
 
 - Each `plugins/*.toml` file is a Proto non-WASM tool plugin.
 - The plugins are intended to be consumed from other repositories through raw GitHub URLs in `[plugins.tools]`.
-- The supported public tool IDs are the TOML file names without the extension, for example `golang-migrate`, `sentrux`, `skillshare`, and `staticcheck`.
+- The supported public tool IDs are the TOML file names without the extension, for example `golang-migrate`, `psql`, `sentrux`, `skillshare`, and `staticcheck`.
 - Changes here can affect multiple downstream projects, so prefer small, verifiable edits.
 
 ## Maintenance Rules
@@ -30,12 +30,14 @@ tmpdir="$(mktemp -d)"
 mkdir -p "$tmpdir/user-home"
 cat > "$tmpdir/.prototools" <<EOF
 golang-migrate = "4.19.0"
+psql = "18.3.0"
 sentrux = "0.5.7"
 skillshare = "0.19.5"
 staticcheck = "2026.1.0"
 
 [plugins.tools]
 golang-migrate = "file://$repo_root/plugins/golang-migrate.toml"
+psql = "file://$repo_root/plugins/psql.toml"
 sentrux = "file://$repo_root/plugins/sentrux.toml"
 skillshare = "file://$repo_root/plugins/skillshare.toml"
 staticcheck = "file://$repo_root/plugins/staticcheck.toml"
@@ -43,11 +45,13 @@ EOF
 
 cd "$tmpdir"
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install golang-migrate --config-mode local
+PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install psql --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install sentrux --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install skillshare --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install staticcheck --config-mode local
 
 "$tmpdir/.proto/tools/golang-migrate/4.19.0/migrate" -version    # → 4.19.0
+"$tmpdir/.proto/tools/psql/18.3.0/bin/psql" --version    # → psql (PostgreSQL) 18.3
 SENTRUX_SKIP_GRAMMAR_DOWNLOAD=1 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto run sentrux -- --version    # → sentrux 0.5.7
 "$tmpdir/.proto/tools/skillshare/0.19.5/skillshare" --version    # → skillshare v0.19.5
 "$tmpdir/.proto/tools/staticcheck/2026.1.0/staticcheck/staticcheck" -version    # → staticcheck 2026.1 (v0.7.0)
@@ -81,12 +85,14 @@ When using these plugins in another repository, add the raw URLs to that reposit
 
 ```toml
 golang-migrate = "<version>"
+psql = "<version>"
 sentrux = "<version>"
 skillshare = "<version>"
 staticcheck = "<version>"
 
 [plugins.tools]
 golang-migrate = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/golang-migrate.toml"
+psql = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/psql.toml"
 sentrux = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/sentrux.toml"
 skillshare = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/skillshare.toml"
 staticcheck = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/staticcheck.toml"

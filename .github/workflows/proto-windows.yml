@@ -31,11 +31,13 @@ jobs:
         run: |
           $toolPins = @'
           golang-migrate = "4.19.0"
+          psql = "18.3.0"
           skillshare = "0.19.5"
           '@
 
           $toolPlugins = @'
           golang-migrate = "file://./plugins/golang-migrate.toml"
+          psql = "file://./plugins/psql.toml"
           skillshare = "file://./plugins/skillshare.toml"
           '@
 
@@ -71,6 +73,14 @@ jobs:
           $version = (& proto run skillshare -- --version 2>&1 | Out-String).Trim()
           if ($version -ne "skillshare v0.19.5") {
             throw "Expected skillshare v0.19.5, got '$version'"
+          }
+
+      - name: Verify psql
+        shell: pwsh
+        run: |
+          $version = (& proto run psql -- --version 2>&1 | Out-String).Trim()
+          if ($version -ne "psql (PostgreSQL) 18.3") {
+            throw "Expected psql (PostgreSQL) 18.3, got '$version'"
           }
 
       - name: Verify sentrux

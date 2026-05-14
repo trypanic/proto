@@ -1,0 +1,26 @@
+name = "psql"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+download-file = "postgresql-{version}-{arch}-unknown-linux-gnu.tar.gz"
+exe-path = "bin/psql"
+
+[platform.macos]
+archs = ["x86_64", "aarch64"]
+download-file = "postgresql-{version}-{arch}-apple-darwin.tar.gz"
+exe-path = "bin/psql"
+
+[platform.windows]
+archs = ["x86_64", "aarch64"]
+download-file = "postgresql-{version}-{arch}-pc-windows-msvc.tar.gz"
+exe-path = "bin/psql.exe"
+
+[install]
+download-url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/{version}/{download_file}"
+
+[install.exes.psql]
+primary = true
+
+[resolve]
+git-url = "https://github.com/theseus-rs/postgresql-binaries"
