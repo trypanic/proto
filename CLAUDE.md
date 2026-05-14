@@ -60,7 +60,7 @@ Use explicit tool versions, never `latest` — validation must be reproducible. 
 
 Three workflows under `.github/workflows/` run on push to `main`: `proto-linux.yml` (Linux x86_64 + aarch64), `proto-macos.yml` (macOS x86_64 + aarch64), and `proto-windows.yml` (Windows x86_64 + aarch64). Each writes a temporary `.prototools` referencing `file://./plugins/<plugin>.toml` (the checked-out commit, not raw `main` URLs), runs `proto install --config-mode local`, then asserts each supported binary's version output. Sentrux is skipped on macOS x86_64 and Windows aarch64 because upstream does not publish those release assets. Staticcheck, psql, and mongosh are skipped on Windows aarch64 because upstream does not publish those release archives.
 
-The workflows pass `cache-version: ${{ hashFiles('plugins/**/*.toml') }}` to `moonrepo/setup-toolchain@v0` so any plugin TOML change invalidates the cached `~/.proto` store. Without this, the cache key is constant across runs (since `.prototools` is generated at runtime after setup-toolchain) and a broken install from a previous CI run would persist.
+The workflows pass `cache: false` to `moonrepo/setup-toolchain@v0`. Caching `~/.proto` between runs would otherwise poison validation: setup-toolchain restores from a constant restore-key prefix (`moonrepo-toolchain-v3-<platform>-<arch>`) that ignores `cache-version`, so a broken install from a previous CI run survives plugin TOML fixes. Plugin tools are fast to install fresh, so caching is not worth the lost reproducibility.
 
 When adding a plugin, update all workflows so the new tool is installed and verified.
 
