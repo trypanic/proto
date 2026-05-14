@@ -9,6 +9,7 @@ The plugin files live under `plugins/`. Each TOML file is a non-WASM proto plugi
 | Tool | Plugin file | Executable | Upstream project | Supported platforms |
 | --- | --- | --- | --- | --- |
 | `golang-migrate` | `plugins/golang-migrate.toml` | `migrate` | `golang-migrate/migrate` | Linux, macOS, and Windows on `x86_64` and `aarch64` |
+| `mongosh` | `plugins/mongosh.toml` | `mongosh` | `mongodb-js/mongosh` | Linux and macOS on `x86_64` and `aarch64`; Windows on `x86_64` |
 | `psql` | `plugins/psql.toml` | `psql` | `theseus-rs/postgresql-binaries` | Linux and macOS on `x86_64` and `aarch64`; Windows on `x86_64` |
 | `sentrux` | `plugins/sentrux.toml` | `sentrux` | `sentrux/sentrux` | Linux on `x86_64` and `aarch64`; macOS on `aarch64`; Windows on `x86_64` |
 | `skillshare` | `plugins/skillshare.toml` | `skillshare` | `runkids/skillshare` | Linux, macOS, and Windows on `x86_64` and `aarch64` |
@@ -34,6 +35,7 @@ Use the raw GitHub URLs for this repository:
 
 ```toml
 golang-migrate = "<version>"
+mongosh = "<version>"
 psql = "<version>"
 sentrux = "<version>"
 skillshare = "<version>"
@@ -41,6 +43,7 @@ staticcheck = "<version>"
 
 [plugins.tools]
 golang-migrate = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/golang-migrate.toml"
+mongosh = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/mongosh.toml"
 psql = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/psql.toml"
 sentrux = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/sentrux.toml"
 skillshare = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/skillshare.toml"
@@ -65,6 +68,7 @@ Install one tool explicitly:
 
 ```sh
 proto install golang-migrate <version>
+proto install mongosh <version>
 proto install psql <version>
 proto install sentrux <version>
 proto install skillshare <version>
@@ -75,6 +79,7 @@ Run through proto:
 
 ```sh
 proto run golang-migrate -- -version
+proto run mongosh -- --version
 proto run psql -- --version
 proto run sentrux -- --version
 proto run skillshare -- --help
@@ -85,6 +90,7 @@ After proto shims are active in `PATH`, the primary executable can also be calle
 
 ```sh
 migrate -version
+mongosh --version
 psql --version
 sentrux --version
 skillshare --help
@@ -102,7 +108,7 @@ Pushes to `main` run GitHub Actions validation for the checked-out plugin defini
 - Windows `x86_64` on `windows-2025`
 - Windows `aarch64` on `windows-11-arm`
 
-Each job installs proto, creates a temporary `.prototools` that points to the checked-out TOML plugin files under `plugins/`, installs supported plugin tools, and verifies the installed binaries. Psql is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`. Sentrux is validated on Linux for both configured architectures, on macOS `aarch64`, and on Windows `x86_64`. Staticcheck is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`.
+Each job installs proto, creates a temporary `.prototools` that points to the checked-out TOML plugin files under `plugins/`, installs supported plugin tools, and verifies the installed binaries. Mongosh is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`. Psql is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`. Sentrux is validated on Linux for both configured architectures, on macOS `aarch64`, and on Windows `x86_64`. Staticcheck is validated on Linux and macOS for both configured architectures, and on Windows `x86_64`.
 
 ## Plugin details
 
@@ -125,6 +131,27 @@ The plugin resolves available versions from Git tags in `https://github.com/gola
 
 ```text
 https://github.com/golang-migrate/migrate/releases/download/v{version}/{download_file}
+```
+
+### mongosh
+
+`plugins/mongosh.toml` installs the `mongosh` (MongoDB Shell) binary from the MongoDB downloads server:
+
+- Linux: `mongosh-{version}-linux-{arch}.tgz`
+- macOS: `mongosh-{version}-darwin-{arch}.zip`
+- Windows: `mongosh-{version}-win32-{arch}.zip`
+
+The upstream archives unpack to a `mongosh-{version}-{platform}-{arch}/` directory containing the executable under `bin/`. The plugin maps proto/Rust architecture names to the release archive naming used by mongosh:
+
+| proto arch | Release arch |
+| --- | --- |
+| `x86_64` | `x64` |
+| `aarch64` | `arm64` |
+
+The plugin resolves available versions from Git tags in `https://github.com/mongodb-js/mongosh` and downloads archives from:
+
+```text
+https://downloads.mongodb.com/compass/{download_file}
 ```
 
 ### psql

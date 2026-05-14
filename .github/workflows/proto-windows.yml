@@ -42,6 +42,8 @@ jobs:
           '@
 
           if ("${{ matrix.arch }}" -eq "x86_64") {
+            $toolPins += "`nmongosh = `"2.8.3`""
+            $toolPlugins += "`nmongosh = `"file://./plugins/mongosh.toml`""
             $toolPins += "`npsql = `"18.3.0`""
             $toolPlugins += "`npsql = `"file://./plugins/psql.toml`""
             $toolPins += "`nsentrux = `"0.5.7`""
@@ -67,6 +69,15 @@ jobs:
           $version = (& proto run golang-migrate -- -version 2>&1 | Out-String).Trim()
           if ($version -ne "4.19.0") {
             throw "Expected golang-migrate 4.19.0, got '$version'"
+          }
+
+      - name: Verify mongosh
+        if: matrix.arch == 'x86_64'
+        shell: pwsh
+        run: |
+          $version = (& proto run mongosh -- --version 2>&1 | Out-String).Trim()
+          if ($version -ne "2.8.3") {
+            throw "Expected mongosh 2.8.3, got '$version'"
           }
 
       - name: Verify skillshare

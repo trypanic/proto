@@ -32,6 +32,7 @@ jobs:
         run: |
           cat > .prototools <<'EOF_CONFIG'
           golang-migrate = "4.19.0"
+          mongosh = "2.8.3"
           psql = "18.3.0"
           sentrux = "0.5.7"
           skillshare = "0.19.5"
@@ -39,6 +40,7 @@ jobs:
 
           [plugins.tools]
           golang-migrate = "file://./plugins/golang-migrate.toml"
+          mongosh = "file://./plugins/mongosh.toml"
           psql = "file://./plugins/psql.toml"
           sentrux = "file://./plugins/sentrux.toml"
           skillshare = "file://./plugins/skillshare.toml"
@@ -53,6 +55,11 @@ jobs:
           version="$(proto run golang-migrate -- -version 2>&1)"
           test "$version" = "4.19.0"
 
+      - name: Verify mongosh
+        run: |
+          version="$(proto run mongosh -- --version 2>&1)"
+          test "$version" = "2.8.3"
+
       - name: Verify skillshare
         run: |
           version="$(proto run skillshare -- --version 2>&1)"
@@ -60,6 +67,9 @@ jobs:
 
       - name: Verify psql
         run: |
+          which psql
+          psql --version
+          proto run psql -- --version
           version="$(proto run psql -- --version 2>&1)"
           test "$version" = "psql (PostgreSQL) 18.3"
 

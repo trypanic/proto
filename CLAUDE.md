@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-Static [proto](https://moonrepo.dev/docs/proto) non-WASM plugin definitions for third-party CLI tools. Each top-level `<tool-id>.toml` is a standalone plugin consumed from other repositories via raw GitHub URLs in their `.prototools` `[plugins.tools]` table. Tool ID = TOML filename without extension (`golang-migrate`, `sentrux`, `skillshare`, `staticcheck`).
+Static [proto](https://moonrepo.dev/docs/proto) non-WASM plugin definitions for third-party CLI tools. Each top-level `<tool-id>.toml` is a standalone plugin consumed from other repositories via raw GitHub URLs in their `.prototools` `[plugins.tools]` table. Tool ID = TOML filename without extension (`golang-migrate`, `mongosh`, `psql`, `sentrux`, `skillshare`, `staticcheck`).
 
 Changes here propagate to every downstream consumer pinned at `main`. Prefer small, verifiable edits.
 
@@ -27,12 +27,14 @@ tmpdir="$(mktemp -d)"
 mkdir -p "$tmpdir/user-home"
 cat > "$tmpdir/.prototools" <<EOF
 golang-migrate = "4.19.0"
+mongosh = "2.8.3"
 sentrux = "0.5.7"
 skillshare = "0.19.5"
 staticcheck = "2026.1.0"
 
 [plugins.tools]
 golang-migrate = "file://$repo_root/plugins/golang-migrate.toml"
+mongosh = "file://$repo_root/plugins/mongosh.toml"
 sentrux = "file://$repo_root/plugins/sentrux.toml"
 skillshare = "file://$repo_root/plugins/skillshare.toml"
 staticcheck = "file://$repo_root/plugins/staticcheck.toml"
@@ -40,21 +42,23 @@ EOF
 
 cd "$tmpdir"
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install golang-migrate --config-mode local
+PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install mongosh --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install sentrux --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install skillshare --config-mode local
 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto install staticcheck --config-mode local
 
 "$tmpdir/.proto/tools/golang-migrate/4.19.0/migrate" -version    # → 4.19.0
+"$tmpdir/.proto/tools/mongosh/2.8.3/bin/mongosh" --version    # → 2.8.3
 SENTRUX_SKIP_GRAMMAR_DOWNLOAD=1 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-home" proto run sentrux -- --version    # → sentrux 0.5.7
 "$tmpdir/.proto/tools/skillshare/0.19.5/skillshare" --version    # → skillshare v0.19.5
 "$tmpdir/.proto/tools/staticcheck/2026.1.0/staticcheck/staticcheck" -version    # → staticcheck 2026.1 (v0.7.0)
 ```
 
-Use explicit tool versions, never `latest` — validation must be reproducible. Staticcheck's upstream `2026.1` tag is pinned as `2026.1.0` because Proto requires fully qualified versions. Only include `sentrux` in local validation on platforms it publishes: Linux `x86_64`/`aarch64`, macOS `aarch64`, and Windows `x86_64`. Only include `psql` on platforms `theseus-rs/postgresql-binaries` publishes: Linux and macOS `x86_64`/`aarch64`, and Windows `x86_64`.
+Use explicit tool versions, never `latest` — validation must be reproducible. Staticcheck's upstream `2026.1` tag is pinned as `2026.1.0` because Proto requires fully qualified versions. Only include `sentrux` in local validation on platforms it publishes: Linux `x86_64`/`aarch64`, macOS `aarch64`, and Windows `x86_64`. Only include `psql` on platforms `theseus-rs/postgresql-binaries` publishes: Linux and macOS `x86_64`/`aarch64`, and Windows `x86_64`. Only include `mongosh` on platforms it publishes: Linux and macOS `x86_64`/`aarch64`, and Windows `x86_64`.
 
 ## CI
 
-Three workflows under `.github/workflows/` run on push to `main`: `proto-linux.yml` (Linux x86_64 + aarch64), `proto-macos.yml` (macOS x86_64 + aarch64), and `proto-windows.yml` (Windows x86_64 + aarch64). Each writes a temporary `.prototools` referencing `file://./plugins/<plugin>.toml` (the checked-out commit, not raw `main` URLs), runs `proto install --config-mode local`, then asserts each supported binary's version output. Sentrux is skipped on macOS x86_64 and Windows aarch64 because upstream does not publish those release assets. Staticcheck and psql are skipped on Windows aarch64 because upstream does not publish those release archives.
+Three workflows under `.github/workflows/` run on push to `main`: `proto-linux.yml` (Linux x86_64 + aarch64), `proto-macos.yml` (macOS x86_64 + aarch64), and `proto-windows.yml` (Windows x86_64 + aarch64). Each writes a temporary `.prototools` referencing `file://./plugins/<plugin>.toml` (the checked-out commit, not raw `main` URLs), runs `proto install --config-mode local`, then asserts each supported binary's version output. Sentrux is skipped on macOS x86_64 and Windows aarch64 because upstream does not publish those release assets. Staticcheck, psql, and mongosh are skipped on Windows aarch64 because upstream does not publish those release archives.
 
 The workflows pass `cache-version: ${{ hashFiles('plugins/**/*.toml') }}` to `moonrepo/setup-toolchain@v0` so any plugin TOML change invalidates the cached `~/.proto` store. Without this, the cache key is constant across runs (since `.prototools` is generated at runtime after setup-toolchain) and a broken install from a previous CI run would persist.
 

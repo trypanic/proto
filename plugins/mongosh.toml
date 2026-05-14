@@ -1,0 +1,33 @@
+name = "mongosh"
+type = "cli"
+
+[platform.linux]
+archs = ["x86_64", "aarch64"]
+archive-prefix = "mongosh-{version}-linux-{arch}"
+download-file = "mongosh-{version}-linux-{arch}.tgz"
+exe-path = "bin/mongosh"
+
+[platform.macos]
+archs = ["x86_64", "aarch64"]
+archive-prefix = "mongosh-{version}-darwin-{arch}"
+download-file = "mongosh-{version}-darwin-{arch}.zip"
+exe-path = "bin/mongosh"
+
+[platform.windows]
+archs = ["x86_64"]
+archive-prefix = "mongosh-{version}-win32-{arch}"
+download-file = "mongosh-{version}-win32-{arch}.zip"
+exe-path = "bin/mongosh.exe"
+
+[install]
+download-url = "https://downloads.mongodb.com/compass/{download_file}"
+
+[install.arch]
+x86_64 = "x64"
+aarch64 = "arm64"
+
+[install.exes.mongosh]
+primary = true
+
+[resolve]
+git-url = "https://github.com/mongodb-js/mongosh"
