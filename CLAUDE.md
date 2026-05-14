@@ -50,11 +50,13 @@ SENTRUX_SKIP_GRAMMAR_DOWNLOAD=1 PROTO_HOME="$tmpdir/.proto" HOME="$tmpdir/user-h
 "$tmpdir/.proto/tools/staticcheck/2026.1.0/staticcheck/staticcheck" -version    # → staticcheck 2026.1 (v0.7.0)
 ```
 
-Use explicit tool versions, never `latest` — validation must be reproducible. Staticcheck's upstream `2026.1` tag is pinned as `2026.1.0` because Proto requires fully qualified versions. Only include `sentrux` in local validation on platforms it publishes: Linux `x86_64`/`aarch64`, macOS `aarch64`, and Windows `x86_64`.
+Use explicit tool versions, never `latest` — validation must be reproducible. Staticcheck's upstream `2026.1` tag is pinned as `2026.1.0` because Proto requires fully qualified versions. Only include `sentrux` in local validation on platforms it publishes: Linux `x86_64`/`aarch64`, macOS `aarch64`, and Windows `x86_64`. Only include `psql` on platforms `theseus-rs/postgresql-binaries` publishes: Linux and macOS `x86_64`/`aarch64`, and Windows `x86_64`.
 
 ## CI
 
-Three workflows under `.github/workflows/` run on push to `main`: `proto-linux.yml` (Linux x86_64 + aarch64), `proto-macos.yml` (macOS x86_64 + aarch64), and `proto-windows.yml` (Windows x86_64 + aarch64). Each writes a temporary `.prototools` referencing `file://./plugins/<plugin>.toml` (the checked-out commit, not raw `main` URLs), runs `proto install --config-mode local`, then asserts each supported binary's version output. Sentrux is skipped on macOS x86_64 and Windows aarch64 because upstream does not publish those release assets. Staticcheck is skipped on Windows aarch64 because upstream does not publish that release archive.
+Three workflows under `.github/workflows/` run on push to `main`: `proto-linux.yml` (Linux x86_64 + aarch64), `proto-macos.yml` (macOS x86_64 + aarch64), and `proto-windows.yml` (Windows x86_64 + aarch64). Each writes a temporary `.prototools` referencing `file://./plugins/<plugin>.toml` (the checked-out commit, not raw `main` URLs), runs `proto install --config-mode local`, then asserts each supported binary's version output. Sentrux is skipped on macOS x86_64 and Windows aarch64 because upstream does not publish those release assets. Staticcheck and psql are skipped on Windows aarch64 because upstream does not publish those release archives.
+
+The workflows pass `cache-version: ${{ hashFiles('plugins/**/*.toml') }}` to `moonrepo/setup-toolchain@v0` so any plugin TOML change invalidates the cached `~/.proto` store. Without this, the cache key is constant across runs (since `.prototools` is generated at runtime after setup-toolchain) and a broken install from a previous CI run would persist.
 
 When adding a plugin, update all workflows so the new tool is installed and verified.
 

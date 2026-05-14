@@ -25,23 +25,25 @@ jobs:
 
       - name: Install proto
         uses: moonrepo/setup-toolchain@v0
+        with:
+          cache-version: ${{ hashFiles('plugins/**/*.toml') }}
 
       - name: Configure test tools
         shell: pwsh
         run: |
           $toolPins = @'
           golang-migrate = "4.19.0"
-          psql = "18.3.0"
           skillshare = "0.19.5"
           '@
 
           $toolPlugins = @'
           golang-migrate = "file://./plugins/golang-migrate.toml"
-          psql = "file://./plugins/psql.toml"
           skillshare = "file://./plugins/skillshare.toml"
           '@
 
           if ("${{ matrix.arch }}" -eq "x86_64") {
+            $toolPins += "`npsql = `"18.3.0`""
+            $toolPlugins += "`npsql = `"file://./plugins/psql.toml`""
             $toolPins += "`nsentrux = `"0.5.7`""
             $toolPlugins += "`nsentrux = `"file://./plugins/sentrux.toml`""
             $toolPins += "`nstaticcheck = `"2026.1.0`""
@@ -76,6 +78,7 @@ jobs:
           }
 
       - name: Verify psql
+        if: matrix.arch == 'x86_64'
         shell: pwsh
         run: |
           $version = (& proto run psql -- --version 2>&1 | Out-String).Trim()

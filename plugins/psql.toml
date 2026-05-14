@@ -14,7 +14,7 @@ download-file = "postgresql-{version}-{arch}-apple-darwin.tar.gz"
 exe-path = "bin/psql"
 
 [platform.windows]
-archs = ["x86_64", "aarch64"]
+archs = ["x86_64"]
 archive-prefix = "postgresql-{version}-{arch}-pc-windows-msvc"
 download-file = "postgresql-{version}-{arch}-pc-windows-msvc.tar.gz"
 exe-path = "bin/psql.exe"
