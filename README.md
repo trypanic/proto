@@ -40,11 +40,11 @@ skillshare = "<version>"
 staticcheck = "<version>"
 
 [plugins.tools]
-golang-migrate = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/golang-migrate.toml"
-psql = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/psql.toml"
-sentrux = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/sentrux.toml"
-skillshare = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/skillshare.toml"
-staticcheck = "https://raw.githubusercontent.com/trypanic/proto/main/plugins/staticcheck.toml"
+golang-migrate = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/golang-migrate.toml"
+psql = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/psql.toml"
+sentrux = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/sentrux.toml"
+skillshare = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/skillshare.toml"
+staticcheck = "https://raw.githubusercontent.com/trypanic/proto-plugins/main/plugins/staticcheck.toml"
 ```
 
 Replace:
